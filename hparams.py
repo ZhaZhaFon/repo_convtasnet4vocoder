@@ -48,7 +48,7 @@ checkpoint_path = os.path.join("model_new")
 vocoder_test_path = os.path.join("vocoder_test")
 
 batch_size = 8
-epochs = 2000
+epochs = 50 # 2000
 n_warm_up_step = 4000
 
 learning_rate = 1e-3

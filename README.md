@@ -1,3 +1,18 @@
+# repo_convtasnet4vocoder
+
+[原始仓库链接](https://github.com/xcmyz/ConvTasNet4BasisMelGAN), 做了一些修改方便使用
+
+### 文件组织
+‘’‘
+    dataset.py 数据集相关处理
+    hparams.py 超参数
+    train.py 训练循环
+    Makefile HOW-TO use
+’‘’
+
+---
+---
+
 # Conv-TasNet for Basis-MelGAN
 
 Basis-MelGAN: Efficient Neural Vocoder Based on Audio Decomposition. (Accepted by Interspeech 2021)

@@ -1,3 +1,8 @@
+# reference
+# GitHub@xcmyz: https://github.com/xcmyz/ConvTasNet4BasisMelGAN/train.py
+
+# modified and re-distributed by Zifeng Zhao @ Peking University
+
 import torch
 import utils
 import argparse
@@ -16,7 +21,6 @@ from dataset import BufferDataset, DataLoader
 from dataset import get_data_to_buffer, collate_fn_tensor
 from radam import RAdam
 from scheduler import ScheduledOptim
-
 
 def main(args):
     # Get device
@@ -46,16 +50,16 @@ def main(args):
 
     # Load checkpoint if exists
     try:
-        checkpoint = torch.load(os.path.join(hp.checkpoint_path, 'checkpoint_%d.pth.tar' % args.restore_step))
+        checkpoint = torch.load(os.path.join(args.save_dir, 'checkpoint_%d.pth.tar' % args.restore_step))
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         print("\n---Model Restored at Step %d---\n" % args.restore_step)
     except:
-        os.makedirs(hp.checkpoint_path, exist_ok=True)
+        os.makedirs(args.save_dir, exist_ok=True)
         print("\n---Start New Training---\n")
 
     # Init logger
-    os.makedirs(hp.logger_path, exist_ok=True)
+    os.makedirs(os.path.join(args.save_dir, 'logging'), exist_ok=True)
 
     # Get dataset
     dataset = BufferDataset(buffer)
@@ -98,7 +102,7 @@ def main(args):
                 weight_average = mixture_w.sum() / (mixture_w.size(0) * mixture_w.size(1) * mixture_w.size(2))
                 weight_average_ = source_w.sum() / (source_w.size(0) * source_w.size(1) * source_w.size(2) * source_w.size(3))
                 str0 = "weight average value: {:.6f}, weight_ average value: {:.6f}.".format(weight_average, weight_average_)
-                print(str0)
+                #print(str0)
 
                 # Cal Loss
                 # Only calculate human voice snr
@@ -112,7 +116,7 @@ def main(args):
                 # Logger
                 l = loss.item()
                 m_s = torch.mean(max_snr).item()
-                with open(os.path.join("logger", "loss.txt"), "a") as f_loss:
+                with open(os.path.join(args.save_dir, 'logging', "loss.txt"), "a") as f_loss:
                     f_loss.write(str(l)+"\n")
 
                 # Backward
@@ -141,7 +145,7 @@ def main(args):
                     print(str3)
                     print(str4)
 
-                    with open(os.path.join("logger", "logger.txt"), "a") as f_logger:
+                    with open(os.path.join(args.save_dir, 'logging', "logger.txt"), "a") as f_logger:
                         f_logger.write(str0 + "\n")
                         f_logger.write(str1 + "\n")
                         f_logger.write(str2 + "\n")
@@ -151,7 +155,7 @@ def main(args):
 
                 if current_step % hp.save_step == 0:
                     torch.save({'model': model.state_dict(), 'optimizer': optimizer.state_dict()},
-                               os.path.join(hp.checkpoint_path, 'checkpoint_%d.pth.tar' % current_step))
+                               os.path.join(args.save_dir, 'checkpoint_%d.pth.tar' % current_step))
                     print("save model at step %d ..." % current_step)
 
                 end_time = time.perf_counter()
@@ -167,5 +171,6 @@ if __name__ == "__main__":
     parser.add_argument('--restore_step', type=int, default=0)
     parser.add_argument('--frozen_learning_rate', type=bool, default=False)
     parser.add_argument("--learning_rate_frozen", type=float, default=2e-4)
+    parser.add_argument('--save_dir', required=True, type=str, help='path to save models')
     args = parser.parse_args()
     main(args)

@@ -1,3 +1,8 @@
+# reference
+# GitHub@xcmyz: https://github.com/xcmyz/ConvTasNet4BasisMelGAN/dataset.py
+
+# modified and re-distributed by Zifeng Zhao @ Peking University
+
 import torch
 import math
 import time
@@ -13,7 +18,9 @@ from tqdm import tqdm
 from utils import process_text, pad_1D, pad_2D
 from utils import pad_1D_tensor, pad_2D_tensor
 
-DATASET = "aishell3"  # aishell3 or biaobei
+#DATASET = "aishell3"  # aishell3 or biaobei
+DATASET = "biaobei"
+dataset_path = "/home/jiangji/basic/dataset/BZNSYP-convtasnet"
 random.seed(0)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -35,9 +42,9 @@ def get_data_to_buffer():
         noi_filename = f"{filename}.noi.npy"
         wav_filename = f"{filename}.wav.npy"
 
-        mix_filename = os.path.join(hp.dataset_path, mix_filename)
-        noi_filename = os.path.join(hp.dataset_path, noi_filename)
-        wav_filename = os.path.join(hp.dataset_path, wav_filename)
+        mix_filename = os.path.join(dataset_path, mix_filename)
+        noi_filename = os.path.join(dataset_path, noi_filename)
+        wav_filename = os.path.join(dataset_path, wav_filename)
 
         mix = np.load(mix_filename)
         noi = np.load(noi_filename)
