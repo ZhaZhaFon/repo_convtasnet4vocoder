@@ -1,3 +1,8 @@
+# reference
+# GitHub@xcmyz: https://github.com/xcmyz/ConvTasNet4BasisMelGAN/generator.py
+
+# modified and re-distributed by Zifeng Zhao @ Peking University
+
 import torch
 import torch.nn as nn
 
@@ -11,7 +16,8 @@ from tqdm import tqdm
 from analysis import get_model
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-DATASET = "aishell3"  # aishell3 or biaobei
+#DATASET = "aishell3"  # aishell3 or biaobei
+DATASET = "biaobei"
 
 
 def autoencoder(model, wav):
@@ -27,16 +33,18 @@ def autoencoder(model, wav):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--step', type=int, default=0)
+    parser.add_argument('--convtasnet_path', required=True, type=str, help='path to your pre-trained Conv-TasNet')
+    parser.add_argument('--save_dir', required=True, type=str, help='path to save training data (for Basis-MelGAN)')
     args = parser.parse_args()
 
-    model = get_model(args.step)
+    model = get_model(args.convtasnet_path)
     weight = model.module.decoder.basis_signals.weight
     weight = weight.detach().cpu().numpy().astype(np.float32)
-    os.makedirs("Basis-MelGAN-dataset", exist_ok=True)
-    np.save(os.path.join("Basis-MelGAN-dataset", "basis_signal_weight.npy"), weight, allow_pickle=False)
-    os.makedirs(os.path.join("Basis-MelGAN-dataset", "generated"), exist_ok=True)
-    os.makedirs(os.path.join("Basis-MelGAN-dataset", "weight"), exist_ok=True)
+    save_dir = os.path.join(args.save_dir, "BZNSYP-basis")
+    os.makedirs(save_dir, exist_ok=True)
+    np.save(os.path.join(save_dir, "basis_signal_weight.npy"), weight, allow_pickle=False)
+    os.makedirs(os.path.join(save_dir, "generated"), exist_ok=True)
+    os.makedirs(os.path.join(save_dir, "weight"), exist_ok=True)
     list_filename = list()
     if DATASET == "biaobei":
         path_filename = "BZNSYP.txt"
@@ -52,5 +60,5 @@ if __name__ == "__main__":
             wav = torch.Tensor(wav)
             wav_, weight, weight_ = autoencoder(model, wav)
             filename = line.split("/")[-1]
-            audio.save_wav(wav_, os.path.join("Basis-MelGAN-dataset", "generated", filename), hp.sample_rate)
-            np.save(os.path.join("Basis-MelGAN-dataset", "weight", f"{filename}.npy"), weight_)
+            audio.save_wav(wav_, os.path.join(save_dir, "generated", filename), hp.sample_rate)
+            np.save(os.path.join(save_dir, "weight", f"{filename}.npy"), weight_)

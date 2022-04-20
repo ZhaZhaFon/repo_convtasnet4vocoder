@@ -4,9 +4,10 @@
 
 ### 文件组织
 ```
-    dataset.py 数据集相关处理
-    hparams.py 超参数
-    train.py 训练循环
+    dataset.py 数据集相关处理(用于训练Conv-TasNet)
+    generator.py 生成训练数据(用于训练Basis-MelGAN)
+    hparams.py 超参数(用于训练Conv-TasNet)
+    train.py 训练循环(用于训练Conv-TasNet)
     Makefile HOW-TO use
 ```
 

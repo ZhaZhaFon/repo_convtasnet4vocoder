@@ -1,3 +1,8 @@
+# reference
+# GitHub@xcmyz: https://github.com/xcmyz/ConvTasNet4BasisMelGAN/analysis.py
+
+# modified and re-distributed by Zifeng Zhao @ Peking University
+
 import os
 import torch
 import torch.nn as nn
@@ -21,7 +26,8 @@ from sklearn.decomposition import PCA
 
 random.seed(str(time.time()))
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-DATASET = "aishell3"  # aishell3 or biaobei
+#DATASET = "aishell3"  # aishell3 or biaobei
+DATASET = "biaobei"
 
 
 def plot_data(data, filename, figsize=(24, 4)):
@@ -34,8 +40,8 @@ def plot_data(data, filename, figsize=(24, 4)):
     plt.savefig(os.path.join("image", filename))
 
 
-def get_model(num):
-    checkpoint_path = "checkpoint_" + str(num) + ".pth.tar"
+def get_model(convtasnet_path):
+    #checkpoint_path = "checkpoint_" + str(num) + ".pth.tar"
     model = nn.DataParallel(
         tasnet.ConvTasNet(N=hp.N, L=hp.L,
                           B=hp.B, H=hp.H,
@@ -45,7 +51,7 @@ def get_model(num):
                           causal=hp.causal,
                           mask_nonlinear=hp.mask_nonlinear)).to(device)
     model.load_state_dict(
-        torch.load(os.path.join(hp.checkpoint_path, checkpoint_path),
+        torch.load(convtasnet_path,
                    map_location=torch.device(device))['model'])
     model.eval()
     return model
